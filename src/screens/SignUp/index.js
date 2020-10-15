@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { UserContext } from '../../contexts/UserContext';
+
 import SignInput from '../../components/SignInput';
 import { 
     Container, 
@@ -11,19 +13,43 @@ import {
     SignMessageButtonTextBold
 } from './styles'; 
 
+import AsyncStorage from '@react-native-community/async-storage';
 
 import Logo from '../../assets/barber.svg';
 import EmailIcon from '../../assets/email.svg';
 import LockIcon from '../../assets/lock.svg';
 import PersonIcon from '../../assets/person.svg';
 
-export default () => {
-    const navigation = useNavigation();
+import Api from '../../Api';
 
+export default () => {
+    const { dispatch: userDispatch } = useContext(UserContext);
+    const navigation = useNavigation();
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     
+    const handleSignClick = async () => {
+        if (nome != '' && email != '' && senha != '') {
+            let response = await Api.signUp(nome, email, senha);
+            const { token } = response;
+            if (token) {
+                await AsyncStorage.setItem('token', token);
+                userDispatch({
+                    type: 'setAvatar',
+                    payload: {
+                        avatar: response.data.avatar
+                    }
+                });
+                
+                //MainTab
+                navigation.reset({
+                    routes: [{name: 'MainTab'}]
+                })                
+            }
+        }
+    }
+
     const handleMessageButtonClick = () => {
         navigation.reset({
             routes:[{name: 'SignIn'}]
@@ -56,7 +82,7 @@ export default () => {
                     password={true}
                 />
 
-                <CustomButton>
+                <CustomButton onPress={handleSignClick}>
                     <CustomButtonText>CADASTRAR</CustomButtonText>
                 </CustomButton>
             </InputArea>

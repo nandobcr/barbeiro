@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { UserContext } from '../../contexts/UserContext';
+
 import SignInput from '../../components/SignInput';
+
+
 import { 
     Container, 
     CustomButton,
@@ -11,6 +15,9 @@ import {
     SignMessageButtonTextBold
 } from './styles'; 
 
+import AsyncStorage from '@react-native-community/async-storage';
+
+import Api from '../../Api';
 
 import Logo from '../../assets/barber.svg';
 import EmailIcon from '../../assets/email.svg';
@@ -18,8 +25,8 @@ import LockIcon from '../../assets/lock.svg';
 
 
 export default () => {
+    const { dispatch: userDispatch } = useContext(UserContext);
     const navigation = useNavigation();
-
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     
@@ -27,6 +34,33 @@ export default () => {
         navigation.reset({
             routes:[{name: 'SignUp'}]
         });
+    }
+
+    const handleSignClick = async () => {
+        if (email != '' && senha != '') {
+            let response = await Api.signIn(email, senha);
+            if (response.token) {
+                //salvar async storage o token
+                await AsyncStorage.setItem('token', response.token);
+                //salvar no context do usuario
+                userDispatch({
+                    type: 'setAvatar',
+                    payload: {
+                        avatar: response.data.avatar
+                    }
+                });
+                
+                //navegar para uma MainTab
+                navigation.reset({
+                    routes: [{name: 'MainTab'}]
+                });
+
+            } else {
+                alert('Usuário ou senha inválidos.');
+            }
+        } else {
+            alert('Preencha os campos para login.');
+        }
     }
 
     return (
@@ -48,7 +82,7 @@ export default () => {
                     password={true}
                 />
 
-                <CustomButton>
+                <CustomButton onPress={handleSignClick}>
                     <CustomButtonText>LOGIN</CustomButtonText>
                 </CustomButton>
             </InputArea>
