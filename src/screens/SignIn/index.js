@@ -1,9 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../../contexts/UserContext';
-
+import AsyncStorage from '@react-native-community/async-storage';
 import SignInput from '../../components/SignInput';
-
 
 import { 
     Container, 
@@ -14,8 +13,6 @@ import {
     SignMessageButtonText,
     SignMessageButtonTextBold
 } from './styles'; 
-
-import AsyncStorage from '@react-native-community/async-storage';
 
 import Api from '../../Api';
 

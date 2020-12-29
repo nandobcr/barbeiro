@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import Stars from '../components/Stars';
+import { useNavigation } from '@react-navigation/native';
 
-const Area = styled.View`
+const Area = styled.TouchableOpacity`
     background-color: #FFFFFF;
     margin-bottom: 20px;
     border-radius: 20px;
@@ -41,8 +42,20 @@ const VerPerfilButtonText = styled.Text`
 `;
 
 export default ({item}) => {
+    
+    const navigation = useNavigation();
+
+    const handleClick = () => {
+        navigation.navigate('Barbeiro', { 
+            id: item.id,
+            avatar: item.avatar,
+            name: item.name,
+            stars: item.stars
+        });
+    }
+    
     return (
-        <Area>
+        <Area onPress={handleClick}>
             <Avatar source={{uri: item.avatar }} />
             <InfoArea>
                 <UserName>{item.name}</UserName>

@@ -10,27 +10,39 @@ const config = {
 };
 
 export default {
-    checkToken: async(token) => {
+    checkToken: async (token) => {
         const data = JSON.stringify({token});
         const response = await axios.post(`${BASE_API}/auth/refresh`, data, config);
         const responseJson = await response.data;
+
         return responseJson; 
     },
-    signIn:  async(email, password) => {
+    signIn:  async (email, password) => {
         const data = JSON.stringify({email, password});
         const response = await axios.post(`${BASE_API}/auth/login`, data, config);
         const responseJson = await response.data;
         return responseJson; 
     },
-    signUp: async(name, email, password) => {
+    signUp: async (name, email, password) => {
         const data = JSON.stringify({name, email, password});
         const response = await axios.post(`${BASE_API}/user`, data, config);
         const responseJson = await response.data;
         return responseJson; 
     },
-    getBarbeiros: async(lat = null, lng = null, address = null) => {
+    logout: async () => {
+        const token = await AsyncStorage.getItem('token');
+        const data = JSON.stringify({token});
+        await axios.post(`${BASE_API}/auth/logout`, data, config);
+    },
+    getBarbeiros: async (lat = null, lng = null, address = null) => {
         const token = await AsyncStorage.getItem('token');
         const response = await axios.get(`${BASE_API}/barbers?token=${token}&lat=${lat}&lng=${lng}&address${address}`);
+        const responseJson = response.data;
+        return responseJson;
+    },
+    getBarbeiro: async (id) => {
+        const token = await AsyncStorage.getItem('token');
+        const response = await axios.get(`${BASE_API}/barber/${id}?token=${token}`);
         const responseJson = response.data;
         return responseJson;
     }
